@@ -17,6 +17,7 @@ namespace Terkoiz.Skipper
         private const string MainSectionName = "Main";
         internal static ConfigEntry<bool> ModEnabled;
         internal static ConfigEntry<bool> AlwaysDisplay;
+        internal static ConfigEntry<bool> SkipConfirmation;
         internal static ConfigEntry<KeyboardShortcut> DisplayHotkey;
 
         [UsedImplicitly]
@@ -47,6 +48,12 @@ namespace Terkoiz.Skipper
                 "3. Display hotkey",
                 new KeyboardShortcut(KeyCode.LeftControl),
                 "Holding down this key will make the Skip buttons appear.");
+            
+            SkipConfirmation = Config.Bind(
+                MainSectionName,
+                "4. Skip confirmation",
+                true,
+                "If disabled, a confirmation dialog will appear when you press the Skip button.");
         }
 
         [UsedImplicitly]
@@ -54,6 +61,11 @@ namespace Terkoiz.Skipper
         {
             if (!ModEnabled.Value || AlwaysDisplay.Value)
             {
+                if (AlwaysDisplay.Value && QuestObjectiveViewPatch.LastSeenObjectivesBlock != null && !QuestObjectiveViewPatch.LastSeenObjectivesBlock.activeSelf)
+                {
+                    ChangeButtonVisibility(true);
+                }
+                
                 return;
             }
 
